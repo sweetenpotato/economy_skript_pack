@@ -1,104 +1,161 @@
-# 변수 선언
+# 상수 선언
 options:
-    skriptVersion : v1.0
+	skriptVersion: v1.1
+
+# 변수 선언
+variables:
+	{init_money} = 0     # 초기 돈 설정 변수
+	{currency_name} = "원"
 
 # 실행 시
 on load:
-    broadcast ""
-    broadcast "[skript] Enabling Economy skript {@skriptVersion}"
-    broadcast ""
+	broadcast "[skript] Enabling Economy skript {@skriptVersion} by sweetenpotato"
 
 # 처음 입장 시
 on join:
-    if {money.%uuid of player%} is not set:
-        set {money.%uuid of player%} to 10000
+	if {money::%uuid of player%} is not set:
+		set {money::%uuid of player%} to {init_money}
 
+# 명령어
 command /money [<text>] [<offlineplayer>] [<integer>]:
-    trigger:
-        if arg 1 is not set:
-            message "---------------[economy skript]---------------"
-            message "/money check : 자신의 돈을 확인합니다."
-            message "/money give [playername] [amount] : 다른 플레이어에게 돈을 송금합니다."
-            if player is op:
-                message ""
-                message "-------[economy skript operator commands]-------"
-                message "/money add [playername] [amount] : 해당 플레이어의 돈을 입력한 만큼 추가합니다."
-                message "/money subtract [playername] [amount] : 해당 플레이어의 돈을 입력한 만큼 뺍니다."
-                message "/money take [playername] [amount] : 해당 플레이어의 돈을 자신에게 송금시킵니다."
-                message "/money check [playername] : 해당 플레이어가 가지고 있는 금액을 확인합니다."
-                message "/money set [playername] [amount] : 해당 플레이어의 돈을 입력한 금액으로 바꿉니다."
+	trigger:
+		if arg-1 is not set:
+			message "---------------[economy skript]---------------"
+			message "/money show : 자신의 돈을 확인합니다."
+			message "/money give [플레이어 이름] [금액] : 다른 플레이어에게 해당 금액을 송금합니다."
+			message "/money help : 돈과 관련된 명령어를 출력합니다."
+			message "/money menu : 돈과 관련된 GUI 메뉴를 출력합니다."
+			message "/money check : 돈을 수표로 교환하는 GUI 메뉴를 출력합니다."
+			if player is op:
+				message "-------[economy skript operator commands]-------"
+				message "/money add [플레이어 이름] [금액] : 해당 플레이어의 돈을 입력한 만큼 추가합니다."
+				message "/money subtract [플레이어 이름] [금액] : 해당 플레이어의 돈을 입력한 만큼 뺍니다."
+				message "/money take [플레이어 이름] [금액] : 해당 플레이어의 돈을 입력한 만큼 자신에게 송금시킵니다."
+				message "/money show [플레이어 이름] : 해당 플레이어가 가지고 있는 금액을 확인합니다."
+				message "/money set [플레이어 이름] [금액] : 해당 플레이어의 돈을 입력한 금액으로 바꿉니다."
 
-        if arg 1 is "check":
-            if arg 2 is not set:
-                message "[economy skript] %player%님은 %{money.%uuid of player%}%원 가지고 있습니다."
-            else:
-                if player is op:
-                    message "[economy skript] %arg 2%님은 %{money.%uuid of arg 2%}%원 가지고 있습니다."
-                else:
-                    message "[economy skript] 플레이어의 이름을 입력할 필요 없습니다. 사용법 : /money check"
-            
-        if arg 1 is "give":
-            if arg 2 is not set:
-                message "[economy skript] 송금 받을 사람을 지정해 주세요!"
-            else:
-                if arg 3 is not set:
-                    message "[economy skript] 송금할 금액을 지정해 주세요!"
-                else:
-                    if {money.%uuid of player%} >= arg 3:
-                        subtract arg 3 from {money.%uuid of player%}
-                        add arg 3 to {money.%uuid of arg 2%}
-                        message "[economy skript] %arg 3%원이 성공적으로 %arg 2%님께 송금되었습니다."
-                        message "[economy skript] %arg 3%원이 %player%로부터 송금되었습니다." to arg 2
-                    else:
-                        message "[economy skript] 돈이 충분하지 않아 송금이 불가능합니다."
+		else if arg-1 is "show":
+			if arg-2 is not set:
+				message "[Economy Skript] %player%님은 %{money::%uuid of player%}%%{currency_name}% 가지고 있습니다."
+			else:
+				if player is op:
+					message "[Economy Skript] %arg-2%님은 %{money::%uuid of arg-2%}%%{currency_name}% 가지고 있습니다."
+				else:
+					message "[Economy Skript] 해당 플레이어가 가지고 있는 돈을 확인할 권한이 없습니다. 사용법 : /money show"
 
-        if player is op:
-            if arg 1 is "add":
-                if arg 2 is not set:
-                    message "[economy skript] 적용할 플레이어의 닉네임을 적어주세요!"
-                else:
-                    if arg 3 is not set:
-                        message "[economy skript] 해당 플레이어에게 추가할 액수를 적어주세요!"
-                    else:
-                        add arg 3 to {money.%uuid of arg 2%}
-                        message "[economy skript] %arg 3%원이 성공적으로 %arg 2%님께 추가되었습니다."
-                        message "[economy skript] [관리자] %arg 2%님의 계정에 성공적으로 %arg 3%원이 추가되었습니다." to arg 2
-            if arg 1 is "subtract":
-                if arg 2 is not set:
-                    message "[economy skript] 적용할 플레이어의 닉네임을 적어주세요!"
-                else:
-                    if arg 3 is not set:
-                        message "[economy skript] 해당 플레이어에게 뺄 액수를 적어주세요!"
-                    else:
-                        if {money.%uuid of arg 2%} >= arg 3:
-                            subtract arg 3 from {money.%uuid of arg 2%}
-                            message "[economy skript] %arg 3%원이 성공적으로 %arg 2%님께 제거되었습니다."
-                            message "[economy skript] [관리자] %arg 2%님의 계정에 성공적으로 %arg 3%원이 제거되었습니다." to arg 2
-                        else:
-                            message "[economy skript] 해당 플레이어에게 돈이 충분치 않아 빼는 것이 불가능합니다."
-            if arg 1 is "take":
-                if arg 2 is not set:
-                    message "[economy skript] 적용할 플레이어의 닉네임을 적어주세요!"
-                else:
-                    if arg 3 is not set:
-                        message "[economy skript] 해당 플레이어로부터 가져올 액수를 적어주세요!"
-                    else:
-                        if {money.%uuid of arg 2%} >= arg 3:
-                            subtract arg 3 from {money.%uuid of arg 2%}
-                            add arg 3 to {money.%uuid of player%}
-                            message "[economy skript] %arg 3%원을 성공적으로 %arg 2%님으로부터 가져왔습니다."
-                            message "[economy skript] [관리자] %player%님께서 %arg 2%님으로부터 %arg 3%원을 가져갔습니다." to arg 2
-                        else:
-                            message "[economy skript] 해당 플레이어에게 돈이 충분치 않아 가져오는 것이 불가능합니다."
-            if arg 1 is "set":
-                if arg 2 is not set:
-                    message "[economy skript] 적용할 플레이어의 닉네임을 적어주세요!"
-                else:
-                    if arg 3 is not set:
-                        message "[economy skript] 해당 플레이어에게 적용할 액수를 적어주세요!"
-                    else:
-                        set {money.%uuid of arg 2%} to arg 3
-                        message "[economy skript] %arg 3%원을 성공적으로 %arg 2%님께 적용시켰습니다."
-                        message "[economy skript] [관리자] %arg 2%님의 계정이 성공적으로 %arg 3%원으로 되었습니다." to arg 2
-        else:
-            message "[economy skript] 해당 명령어에 대한 권한이 없습니다."
+		else if arg-1 is "give":
+			if arg-2 is not set:
+				message "[Economy Skript] 올바르지 않은 명령어 입니다. 사용법 : /money give [플레이어 이름] [금액]"
+			else:
+				if {money::%uuid of arg-2%} is not set:
+					message "[Economy Skript] 그런 플레이어는 존재하지 않습니다! 유효한 플레이어 이름을 입력해 주세요! 사용법 : /money give [플레이어 이름] [금액]"
+				else:
+					if arg-3 is not set:
+						message "[Economy Skript] 송금할 금액을 입력해 주세요! 사용법 : /money give [플레이어 이름] [금액]"
+					else if arg-3 is more than 0:
+						message "[Economy Skript] 0보다 큰 숫자를 입력해 주세요! 사용법 : /money give [플레이어 이름] [금액]"
+					else if arg-3 is more than {money::%uuid of player%}:
+						message "[Economy Skript] 금액이 너무 큽니다! 자신이 가지고 있는 돈보다 적거나 같은 금액을 입력해 주세요! 사용법 : /money give [플레이어 이름] [금액]"
+					else:
+						subtract arg-3 from {money::%uuid of player%}
+						add arg-3 to {money::%uuid of arg-2%}
+						message "[Economy Skript] %arg-3%%{currency_name}%이 성공적으로 %arg-2%님께 송금되었습니다."
+						message "[Economy Skript] %arg-3%%{currency_name}%이 %player%님으로부터 송금되었습니다." to arg-2
+
+		else if arg-1 is "help":
+			message "---------------[economy skript]---------------"
+			message "/money show : 자신의 돈을 확인합니다."
+			message "/money give [플레이어 이름] [금액] : 다른 플레이어에게 해당 금액을 송금합니다."
+			message "/money help : 돈과 관련된 명령어를 출력합니다."
+			message "/money menu : 돈과 관련된 GUI 메뉴를 출력합니다. (수표 출력은 여기서만 가능합니다)"
+			if player is op:
+				message "-------[economy skript operator commands]-------"
+				message "/money add [플레이어 이름] [금액] : 해당 플레이어의 돈을 입력한 만큼 추가합니다."
+				message "/money subtract [플레이어 이름] [금액] : 해당 플레이어의 돈을 입력한 만큼 뺍니다."
+				message "/money take [플레이어 이름] [금액] : 해당 플레이어의 돈을 입력한 만큼 자신에게 송금시킵니다."
+				message "/money check [플레이어 이름] : 해당 플레이어가 가지고 있는 금액을 확인합니다."
+				message "/money set [플레이어 이름] [금액] : 해당 플레이어의 돈을 입력한 금액으로 바꿉니다."
+
+		else if arg-1 is "add":
+			if player is op:
+				if arg-2 is not set:
+					message "[Economy Skript] 적용할 플레이어의 닉네임을 적어주세요! 사용법 : /money add [플레이어 이름] [금액]"
+				else:
+					if arg-3 is not set:
+						message "[Economy Skript] 줄 금액을 정확히 적어주세요! 사용법 : /money add [플레이어 이름] [금액]"
+					else if arg-3 <= 0:
+						message "[Economy Skript] 0%{currency_name}% 이하의 금액은 줄 수 없습니다! 양수를 입력하세요. 사용법 : /money add [플레이어 이름] [금액]"
+					else:
+						add arg-3 to {money::%uuid of player%}
+						message "[Economy Skript] %arg-3%%{currency_name}%이 성공적으로 %arg-2%님께 추가되었습니다."
+						message "[Economy Skript] %arg-3%%{currency_name}%이 성공적으로 %arg-2%님께 추가되었습니다." to arg-2
+			else:
+				message "[Economy Skript] 해당 명령어를 사용할 권한이 없습니다!"
+		
+		else if arg-1 is "subtract":
+			if player is op:
+				if arg-2 is not set:
+					message "[Economy Skript] 적용할 플레이어의 닉네임을 적어주세요! 사용법 : /money subtract [플레이어 이름] [금액]"
+				else:
+					if arg-3 is not set:
+						message "[Economy Skript] 뺄 금액을 정확히 적어주세요! 사용법 : /money subtract [플레이어 이름] [금액]"
+					else if arg-3 <= 0:
+						message "[Economy Skript] 0%{currency_name}% 이하의 금액은 뺄 수 없습니다! 양수를 입력하세요. 사용법 : /money subtract [플레이어 이름] [금액]"
+					else if arg-3 is more than {money::%uuid of player%}:
+						message "[Economy Skript] 해당 플레이어가 가지고 있는 금액보다 더 많은 금액을 뺄 수 없습니다! %{money::%uuid of player%}%보다 작거나 같은 금액을 입력하세요. 사용법 : /money subtract [플레이어 이름] [금액]"
+					else:
+						subtract arg-3 from {money::%uuid of player%}
+						message "[Economy Skript] %arg-3%%{currency_name}%이 성공적으로 %arg-2%님께 제거되었습니다."
+						message "[Economy Skript] %arg-3%%{currency_name}%이 성공적으로 %arg-2%님께 제거되었습니다." to arg-2
+			else:
+				message "[Economy Skript] 해당 명령어를 사용할 권한이 없습니다!"
+		
+		else if arg-1 is "take":
+			if player is op:
+				if arg-2 is not set:
+					message "[Economy Skript] 적용할 플레이어의 닉네임을 적어주세요! 사용법 : /money take [플레이어 이름] [금액]"
+				else:
+					if arg-3 is not set:
+						message "[Economy Skript] 가져올 금액을 정확히 적어주세요! 사용법 : /money take [플레이어 이름] [금액]"
+					else if arg-3 <= 0:
+						message "[Economy Skript] 0%{currency_name}% 이하의 금액은 가져올 수 없습니다! 양수를 입력하세요. 사용법 : /money take [플레이어 이름] [금액]"
+					else if arg-3 is more than {money::%uuid of player%}:
+						message "[Economy Skript] 해당 플레이어가 가지고 있는 금액보다 더 많은 금액을 가져올 수 없습니다! %{money::%uuid of player%}%보다 작거나 같은 금액을 입력하세요. 사용법 : /money take [플레이어 이름] [금액]"
+					else:
+						subtract arg-3 from {money::%uuid of player%}
+						message "[Economy Skript] %arg-3%%{currency_name}%을 성공적으로 %arg-2%님께서 가져왔습니다."
+						message "[Economy Skript] %arg-3%%{currency_name}%을 성공적으로 %player%님께서 가져갔습니다." to arg-2
+			else:
+				message "[Economy Skript] 해당 명령어를 사용할 권한이 없습니다!"
+
+		else if arg-1 is "set":
+			if player is op:
+				if arg-2 is not set:
+					message "[Economy Skript] 적용할 플레이어의 닉네임을 적어주세요! 사용법 : /money set [플레이어 이름] [금액]"
+				else:
+					if arg-3 is not set:
+						message "[Economy Skript] 가져올 금액을 정확히 적어주세요! 사용법 : /money take [플레이어 이름] [금액]"
+					else if arg-3 <= 0:
+						message "[Economy Skript] 0%{currency_name}% 이하의 금액은 가져올 수 없습니다! 양수를 입력하세요. 사용법 : /money take [플레이어 이름] [금액]"
+					else if arg-3 is more than {money::%uuid of player%}:
+						message "[Economy Skript] 해당 플레이어가 가지고 있는 금액보다 더 많은 금액을 가져올 수 없습니다! %{money::%uuid of player%}%보다 작거나 같은 금액을 입력하세요. 사용법 : /money take [플레이어 이름] [금액]"
+					else:
+						subtract arg-3 from {money::%uuid of player%}
+						message "[Economy Skript] %arg-3%%{currency_name}%을 성공적으로 %arg-2%님께서 가져왔습니다."
+						message "[Economy Skript] %arg-3%%{currency_name}%을 성공적으로 %player%님께서 가져갔습니다." to arg-2
+			else:
+				message "[Economy Skript] 해당 명령어를 사용할 권한이 없습니다!"
+		
+		else if arg-1 is "menu":
+			if player is op:
+				set {_slot::%uuid of player%::13} to player's skull named "닉네임 : %player%"
+				set lore of {_slot::%uuid of player%::13} to "소지 금액 : %{money::%uuid of player%}%%{currency_name}%"
+				loop {_slot::%uuid of player%::*}:
+					set {gui::economy_core_gui::slot::%uuid of player%::%loop-index%} to loop-value
+				clear {_slot::*}
+				set {_inv} to chest inventory with 5 rows named "&1&l메뉴"
+				loop {gui::economy_core_gui::slot::%uuid of player%::*}:
+					set {_slot} to loop-index parsed as integer
+					set slot {_slot} of {_inv} to loop-value
+				open {_inv} to player
+				clear {gui::economy_core_gui::slot::%uuid of player%::*}
